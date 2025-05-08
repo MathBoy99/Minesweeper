@@ -12,16 +12,21 @@ pygame.display.set_caption("Image Grid")
 # Grid dimensions (you can modify this)
 grid_size = 8  # Size of the square grid (e.g., 3x3)
 
-# Load the image
-image = pygame.image.load('Untitled design (7).png')
-# Scale image to fit grid nicely with a smaller size
+def load_and_scale_image(image_name, cell_size, scale_factor=0.5):
+    """Load and scale an image based on cell size and scale factor"""
+    image = pygame.image.load(image_name)
+    scaled_size = int(cell_size * scale_factor)
+    return pygame.transform.scale(image, (scaled_size, scaled_size))
+
+# Calculate grid cell sizes
 scale_factor = 0.5  # Adjust this value between 0 and 1 to change image size
 cell_width = screen.get_width() // grid_size
 cell_height = screen.get_height() // grid_size
-# Use the smaller dimension to maintain aspect ratio
 cell_size = min(cell_width, cell_height)
 scaled_size = int(cell_size * scale_factor)
-image = pygame.transform.scale(image, (scaled_size, scaled_size))
+
+# Load and scale the image
+image = load_and_scale_image('Untitled design (7).png', cell_size, scale_factor)
 
 # Game loop
 running = True
