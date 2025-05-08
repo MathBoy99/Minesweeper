@@ -10,7 +10,7 @@ screen = pygame.display.set_mode((800, 600))
 pygame.display.set_caption("Image Display")
 
 # Load the image (replace 'image.png' with your image file)
-image = pygame.image.load('image.png')
+image = pygame.image.load('Untitled design (7).png')
 
 # Game loop
 running = True
