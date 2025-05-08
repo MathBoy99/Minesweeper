@@ -24,13 +24,9 @@ cell_size = min(cell_width, cell_height)
 scaled_size = int(cell_size * scale_factor)
 image = pygame.transform.scale(image, (scaled_size, scaled_size))
 
-# Update padding calculations for the new square cells
+# Calculate padding to center the grid
 x_padding = (screen.get_width() - (scaled_size * grid_width)) // 2
 y_padding = (screen.get_height() - (scaled_size * grid_height)) // 2
-
-# Calculate padding to center the grid
-x_padding = (screen.get_width() - (scaled_width * grid_width)) // 2
-y_padding = (screen.get_height() - (scaled_height * grid_height)) // 2
 
 # Game loop
 running = True
