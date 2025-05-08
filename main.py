@@ -5,18 +5,17 @@ import os
 # Initialize Pygame
 pygame.init()
 
+def load_and_scale_image(image_name, cell_size, scale_factor=0.5):
+  """Load and scale an image based on cell size and scale factor"""
+  image = pygame.image.load(image_name)
+  scaled_size = int(cell_size * scale_factor)
+  return pygame.transform.scale(image, (scaled_size, scaled_size))
 # Set up the display
 screen = pygame.display.set_mode((800, 600))
 pygame.display.set_caption("Image Grid")
 
 # Grid dimensions (you can modify this)
 grid_size = 8  # Size of the square grid (e.g., 3x3)
-
-def load_and_scale_image(image_name, cell_size, scale_factor=0.5):
-    """Load and scale an image based on cell size and scale factor"""
-    image = pygame.image.load(image_name)
-    scaled_size = int(cell_size * scale_factor)
-    return pygame.transform.scale(image, (scaled_size, scaled_size))
 
 # Calculate grid cell sizes
 scale_factor = 0.5  # Adjust this value between 0 and 1 to change image size
