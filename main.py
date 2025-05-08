@@ -20,7 +20,7 @@ while running:
             running = False
     
     # Fill screen with white
-    screen.fill((255, 255, 255))
+    screen.fill((0, 120, 120))
     
     # Draw the image at position (0, 0)
     screen.blit(image, (0, 0))
