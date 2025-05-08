@@ -24,10 +24,6 @@ cell_size = min(cell_width, cell_height)
 scaled_size = int(cell_size * scale_factor)
 image = pygame.transform.scale(image, (scaled_size, scaled_size))
 
-# Calculate padding to center the grid
-x_padding = (screen.get_width() - (scaled_size * grid_width)) // 2
-y_padding = (screen.get_height() - (scaled_size * grid_height)) // 2
-
 # Game loop
 running = True
 while running:
@@ -41,8 +37,8 @@ while running:
     # Draw grid of images
     for row in range(grid_height):
         for col in range(grid_width):
-            x = x_padding + (col * scaled_size)
-            y = y_padding + (row * scaled_size)
+            x = col * scaled_size
+            y = row * scaled_size
             screen.blit(image, (x, y))
     
     # Update the display
