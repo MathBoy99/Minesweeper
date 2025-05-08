@@ -10,7 +10,7 @@ screen = pygame.display.set_mode((800, 600))
 pygame.display.set_caption("Image Grid")
 
 # Grid dimensions (you can modify this)
-grid_size = 3  # Size of the square grid (e.g., 3x3)
+grid_size = 8  # Size of the square grid (e.g., 3x3)
 
 # Load the image
 image = pygame.image.load('Untitled design (7).png')
