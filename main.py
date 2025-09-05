@@ -289,7 +289,8 @@ while running:
                 else:
                     times=0
                     index=get_index(pygame.mouse.get_pos()[0],pygame.mouse.get_pos()[1],grid_length,grid_height,scaled_size)
-                    if str(index)!=":(" and (len(grid)-1) >= index and index>-1 and hide_grid[index]==1:
+                    if str(index)!=":(" and (len(grid)-1) >= int(index) and int(index)>-1 and hide_grid[int(index)]==1:
+                        index = int(index)
                         if not started:
                             do_go=list(range(len(grid)))
                             do_go.remove(index)
