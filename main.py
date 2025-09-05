@@ -127,7 +127,7 @@ settings_guess_flags=Stuff[7]
 grid=Stuff[8]
 hide_grid=Stuff[9]
 mines=Stuff[10]
-apple_tree=2
+apple_tree=0
 
 fill=[0,120,120]
 e=0
@@ -457,23 +457,22 @@ while running:
                     mem_in_settings = False
                 elif event.unicode.isdigit():
                     print(f"Number key pressed: {event.unicode}")
-            elif event.type == pygame.KEYUP and not mem_in_settings and changed:
-                
-                Stuff=start_program_math(grid_length,grid_height,mine_density,scale_factor)
-                guess_flag_help=Stuff[0]
-                listy_list=Stuff[1]
-                wordy_word=Stuff[2]
-                cell_size=Stuff[3]
-                scaled_size=Stuff[4]
-                img_list=Stuff[5]
-                tiles_in_order=Stuff[6]
-                guess_flags=Stuff[7]
-                grid=Stuff[8]
-                hide_grid=Stuff[9]
-                mines=Stuff[10]
-                flagged=mines
+            elif event.type == pygame.KEYUP and not mem_in_settings:
+                if changed:
+                    Stuff=start_program_math(grid_length,grid_height,mine_density,scale_factor)
+                    guess_flag_help=Stuff[0]
+                    listy_list=Stuff[1]
+                    wordy_word=Stuff[2]
+                    cell_size=Stuff[3]
+                    scaled_size=Stuff[4]
+                    img_list=Stuff[5]
+                    tiles_in_order=Stuff[6]
+                    guess_flags=Stuff[7]
+                    grid=Stuff[8]
+                    hide_grid=Stuff[9]
+                    mines=Stuff[10]
+                    flagged=mines
                 in_settings=False
                 
     pygame.display.flip()
-asdnjk+=1
 pygame.quit()
