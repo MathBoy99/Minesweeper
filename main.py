@@ -443,6 +443,8 @@ while running:
                         in_settings = True
                         apple_tree=0
     elif in_settings:
+        bounds=[]
+        
         if apple_tree==0:
             mem_grid_length=grid_length
             mem_grid_height=grid_height
