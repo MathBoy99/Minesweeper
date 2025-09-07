@@ -139,7 +139,10 @@ fill=[0,120,120]
 e=0
 times=0
 started = False
-adjecent = [1,-1,grid_length,-grid_length,grid_length+1,grid_length-1,-grid_length+1,-grid_length-1]
+def get_adjacent(grid_length):
+    return [1,-1,grid_length,-grid_length,grid_length+1,grid_length-1,-grid_length+1,-grid_length-1]
+
+adjecent = get_adjacent(grid_length)
 play=True
 r=True
 count=0
@@ -493,6 +496,7 @@ while running:
                     flagged=mines
                     grid_length=j[0]*10+j[1]
                     grid_height=j[2]*10+j[3]
+                    adjecent = get_adjacent(grid_length)
                 started=False
                 in_settings=False
                 
