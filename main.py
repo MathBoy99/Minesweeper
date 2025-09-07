@@ -131,6 +131,10 @@ hide_grid=Stuff[9]
 mines=Stuff[10]
 apple_tree=0
 
+settings_buttons=[pygame.Rect(0,0,scaled_size,scaled_size),pygame.Rect(scaled_size,0,scaled_size,scaled_size),pygame.Rect(0,scaled_size,scaled_size,scaled_size),pygame.Rect(scaled_size,scaled_size,scaled_size,scaled_size)]
+
+settings_buttons_meaning=["grid_length_tens_digit","grid_length_ones_digit","grid_height_tens_digit","grid_height_ones_digit","mine_density_tens_digit","mine_density_ones_digit","scale_factor_ones_digit","scale_factor_tenths_digit","scale_factor_hundredths_digit"]
+j=[2,4,1,6,1,9,1,0,0]
 fill=[0,120,120]
 e=0
 times=0
@@ -232,7 +236,6 @@ while running:
                         guess_flag_help=4
                     elif event.key == pygame.K_s:
                         apple_tree=2
-                        print("The settings is broken")
                 elif ete==2 and event.type==pygame.KEYUP and grids_generated>0:
                     y=-1
                     ete=0
@@ -256,7 +259,6 @@ while running:
                     print("")
                     print("Number of grids generated: "+str(grids_generated))
                 elif apple_tree==2 and event.type==pygame.KEYUP:
-                    print("The conditional is broken")
                     apple_tree=0
                     changed=False
                     in_settings = True
@@ -291,8 +293,11 @@ while running:
                 else:
                     times=0
                     index=get_index(pygame.mouse.get_pos()[0],pygame.mouse.get_pos()[1],grid_length,grid_height,scaled_size)
+                    print("this code ran")
                     if str(index)!=":(" and (len(grid)-1) >= index and index>-1 and hide_grid[index]==1:
+                        print("this code also ran")
                         if not started:
+                            print("this code also also ran")
                             do_go=list(range(len(grid)))
                             do_go.remove(index)
                             hide_grid[index]=0
@@ -443,14 +448,15 @@ while running:
                         in_settings = True
                         apple_tree=0
     elif in_settings:
-        bounds=[]
-        
+        for item in settings_buttons:
+            screen.blit(settings_tiles_in_order[j[settings_buttons.index(item)]], (item.x, item.y))
         if apple_tree==0:
             mem_grid_length=grid_length
             mem_grid_height=grid_height
             mem_mine_density=mine_density
             mem_scale_factor=scale_factor
             apple_tree=1
+            mem_in_settings=True
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 running = False
@@ -460,10 +466,19 @@ while running:
                 elif event.key == pygame.K_s:
                     mem_in_settings = False
                 elif event.unicode.isdigit():
-                    print(f"Number key pressed: {event.unicode}")
+                    mousex=pygame.mouse.get_pos()[0]
+                    mousey=pygame.mouse.get_pos()[1]
+                    thingy_thing=0
+                    for item in settings_buttons:
+                        if item.collidepoint(mousex,mousey):
+                            if j[thingy_thing]!=int(f"{event.unicode}"):
+                                j[thingy_thing]=int(f"{event.unicode}")
+                        thingy_thing+=1
             elif event.type == pygame.KEYUP and not mem_in_settings:
+                if j[0]*10+j[1]!=grid_length or j[2]*10+j[3]!=grid_height or (j[4]/10+j[5]/100)!=mine_density or j[6]+j[7]/10+j[8]/100!=scale_factor:
+                    changed=True
                 if changed:
-                    Stuff=start_program_math(grid_length,grid_height,mine_density,scale_factor)
+                    Stuff=start_program_math(j[0]*10+j[1],j[2]*10+j[3],(j[4]/10+j[5]/100),j[6]+j[7]/10+j[8]/100)
                     guess_flag_help=Stuff[0]
                     listy_list=Stuff[1]
                     wordy_word=Stuff[2]
@@ -476,6 +491,9 @@ while running:
                     hide_grid=Stuff[9]
                     mines=Stuff[10]
                     flagged=mines
+                    grid_length=j[0]*10+j[1]
+                    grid_height=j[2]*10+j[3]
+                started=False
                 in_settings=False
                 
     pygame.display.flip()
