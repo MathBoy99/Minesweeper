@@ -476,7 +476,7 @@ while running:
                         thingy_thing+=1
             elif event.type == pygame.KEYUP and not mem_in_settings:
                 mem_in_settings=True
-                if j[0]*10+j[1]!=grid_length or j[2]*10+j[3]!=grid_height or (j[4]/10+j[5]/100)!=mine_density or j[6]+j[7]/10+j[8]/100!=scale_factor:
+                if j[0]*10+j[1]!=mem_grid_length or j[2]*10+j[3]!=mem_grid_height or (j[4]/10+j[5]/100)!=mem_mine_density or j[6]+j[7]/10+j[8]/100!=mem_scale_factor:
                     changed=True
                 if changed:
                     Stuff=start_program_math(j[0]*10+j[1],j[2]*10+j[3],(j[4]/10+j[5]/100),j[6]+j[7]/10+j[8]/100)
