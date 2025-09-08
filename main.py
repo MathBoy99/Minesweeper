@@ -131,7 +131,7 @@ hide_grid=Stuff[9]
 mines=Stuff[10]
 apple_tree=0
 
-settings_buttons=[pygame.Rect(0,0,scaled_size,scaled_size),pygame.Rect(scaled_size,0,scaled_size,scaled_size),pygame.Rect(0,scaled_size,scaled_size,scaled_size),pygame.Rect(scaled_size,scaled_size,scaled_size,scaled_size)]
+settings_buttons=[pygame.Rect(0,0,scaled_size,scaled_size),pygame.Rect(scaled_size,0,scaled_size,scaled_size),pygame.Rect(0,scaled_size,scaled_size,scaled_size),pygame.Rect(scaled_size,scaled_size,scaled_size,scaled_size),pygame.Rect(0,scaled_size*2,scaled_size,scaled_size),pygame.Rect(scaled_size,scaled_size*2,scaled_size,scaled_size),pygame.Rect(0,scaled_size*3,scaled_size,scaled_size),pygame.Rect(scaled_size,scaled_size*3,scaled_size,scaled_size),pygame.Rect(scaled_size*2,scaled_size*3,scaled_size,scaled_size)]
 
 settings_buttons_meaning=["grid_length_tens_digit","grid_length_ones_digit","grid_height_tens_digit","grid_height_ones_digit","mine_density_tens_digit","mine_density_ones_digit","scale_factor_ones_digit","scale_factor_tenths_digit","scale_factor_hundredths_digit"]
 j=[2,4,1,6,1,9,1,0,0]
@@ -296,11 +296,8 @@ while running:
                 else:
                     times=0
                     index=get_index(pygame.mouse.get_pos()[0],pygame.mouse.get_pos()[1],grid_length,grid_height,scaled_size)
-                    print("this code ran")
                     if str(index)!=":(" and (len(grid)-1) >= index and index>-1 and hide_grid[index]==1:
-                        print("this code also ran")
                         if not started:
-                            print("this code also also ran")
                             do_go=list(range(len(grid)))
                             do_go.remove(index)
                             hide_grid[index]=0
@@ -478,6 +475,7 @@ while running:
                                 j[thingy_thing]=int(f"{event.unicode}")
                         thingy_thing+=1
             elif event.type == pygame.KEYUP and not mem_in_settings:
+                mem_in_settings=True
                 if j[0]*10+j[1]!=grid_length or j[2]*10+j[3]!=grid_height or (j[4]/10+j[5]/100)!=mine_density or j[6]+j[7]/10+j[8]/100!=scale_factor:
                     changed=True
                 if changed:
@@ -497,7 +495,12 @@ while running:
                     grid_length=j[0]*10+j[1]
                     grid_height=j[2]*10+j[3]
                     adjecent = get_adjacent(grid_length)
-                started=False
+                    started=False
+                    mine_density=j[4]/10+j[5]/100
+                    scale_factor=j[6]+j[7]/10+j[8]/100
+                    grids_generated=0
+                    grids_with=[0,0,0,0,0,0,0,0,0]
+                    play=True
                 in_settings=False
                 
     pygame.display.flip()
