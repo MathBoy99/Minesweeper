@@ -3,6 +3,8 @@ os.environ['PYGAME_HIDE_SUPPORT_PROMPT'] = '1'
 import pygame
 import random
 import time
+import sys
+pygame.font.init()
 changed=False
 ete=0
 # Base grid_length is 24
@@ -130,8 +132,14 @@ grid=Stuff[8]
 hide_grid=Stuff[9]
 mines=Stuff[10]
 apple_tree=0
-
-settings_buttons=[pygame.Rect(0,0,scaled_size,scaled_size),pygame.Rect(scaled_size,0,scaled_size,scaled_size),pygame.Rect(0,scaled_size,scaled_size,scaled_size),pygame.Rect(scaled_size,scaled_size,scaled_size,scaled_size),pygame.Rect(0,scaled_size*2,scaled_size,scaled_size),pygame.Rect(scaled_size,scaled_size*2,scaled_size,scaled_size),pygame.Rect(0,scaled_size*3,scaled_size,scaled_size),pygame.Rect(scaled_size,scaled_size*3,scaled_size,scaled_size),pygame.Rect(scaled_size*2,scaled_size*3,scaled_size,scaled_size)]
+gap=5
+apple_trees=30
+settings_buttons=[pygame.Rect(0,0,scaled_size,scaled_size),pygame.Rect(scaled_size,0,scaled_size,scaled_size),pygame.Rect(0,scaled_size+gap,scaled_size,scaled_size+gap),pygame.Rect(scaled_size,scaled_size+gap,scaled_size,scaled_size),pygame.Rect(apple_trees,scaled_size*2+gap*2,scaled_size+apple_trees,scaled_size+gap*2),pygame.Rect(scaled_size+apple_trees,scaled_size*2+gap*2,scaled_size+apple_trees,scaled_size+gap*2),pygame.Rect(0,scaled_size*3+gap*3,scaled_size,scaled_size+gap*3),pygame.Rect(scaled_size,scaled_size*3+gap*3,scaled_size,scaled_size+gap*3),pygame.Rect(scaled_size*2,scaled_size*3+gap*3,scaled_size,scaled_size+gap*3)]
+for item in settings_buttons:
+    item[1]+=45
+    item[3]+=45
+    item[0]+=210
+    item[2]+=210
 
 settings_buttons_meaning=["grid_length_tens_digit","grid_length_ones_digit","grid_height_tens_digit","grid_height_ones_digit","mine_density_tens_digit","mine_density_ones_digit","scale_factor_ones_digit","scale_factor_tenths_digit","scale_factor_hundredths_digit"]
 j=[2,4,1,6,1,9,1,0,0]
@@ -156,6 +164,19 @@ sad=[0,0]
 bad=[]
 running = True
 in_settings = False
+text_list = [
+  {"text": "Settings", "position": (0, 0), "font_size": 48},
+  {"text": "Grid Length:", "position": (0, 50), "font_size": 24},
+  {"text": "Grid Height:", "position": (0, 50+scaled_size+gap), "font_size": 24},
+  {"text": "Mine Density:", "position": (0, 50+scaled_size*2+gap*2), "font_size": 24},
+]
+rendered_texts = []
+for item in text_list:
+  custom_font = pygame.font.Font('font.ttf', item["font_size"])
+  text_surface = custom_font.render(item["text"], True, (255, 255, 255))
+  rendered_texts.append({"surface": text_surface, "position": item["position"]})
+
+
 while running:
     time.sleep(0.01)
     screen.fill(fill)
@@ -450,6 +471,8 @@ while running:
     elif in_settings:
         for item in settings_buttons:
             screen.blit(settings_tiles_in_order[j[settings_buttons.index(item)]], (item.x, item.y))
+        for rendered_item in rendered_texts:
+          screen.blit(rendered_item["surface"], rendered_item["position"])
         if apple_tree==0:
             mem_grid_length=grid_length
             mem_grid_height=grid_height
@@ -502,6 +525,7 @@ while running:
                     grids_with=[0,0,0,0,0,0,0,0,0]
                     play=True
                 in_settings=False
+                changed=False
                 
     pygame.display.flip()
 pygame.quit()
