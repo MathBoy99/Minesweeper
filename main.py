@@ -496,6 +496,7 @@ while running:
                         if item.collidepoint(mousex,mousey):
                             if j[thingy_thing]!=int(f"{event.unicode}"):
                                 j[thingy_thing]=int(f"{event.unicode}")
+                            break
                         thingy_thing+=1
             elif event.type == pygame.KEYUP and not mem_in_settings:
                 mem_in_settings=True
