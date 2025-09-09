@@ -198,7 +198,7 @@ text_list = [
 ]
 rendered_texts = []
 for item in text_list:
-  custom_font = pygame.font.Font('font.ttf', item["font_size"])
+  custom_font = pygame.font.Font(None, item["font_size"])
   text_surface = custom_font.render(item["text"], True, (255, 255, 255))
   rendered_texts.append({"surface": text_surface, "position": item["position"]})
 
@@ -518,10 +518,27 @@ while running:
                     mousex=pygame.mouse.get_pos()[0]
                     mousey=pygame.mouse.get_pos()[1]
                     thingy_thing=0
+                    digit_val = int(f"{event.unicode}")
                     for item in settings_buttons:
                         if item.collidepoint(mousex,mousey):
-                            if j[thingy_thing]!=int(f"{event.unicode}"):
-                                j[thingy_thing]=int(f"{event.unicode}")
+                            # Add range validation for different settings
+                            valid_input = True
+                            if thingy_thing < 4:  # Grid length/height validation
+                                if thingy_thing in [0, 2] and digit_val > 9:  # tens digits
+                                    valid_input = False
+                                elif thingy_thing in [1, 3] and digit_val > 9:  # ones digits  
+                                    valid_input = False
+                            elif thingy_thing < 6:  # Mine density validation (0.XX format)
+                                if digit_val > 9:
+                                    valid_input = False
+                            else:  # Scale factor validation
+                                if thingy_thing == 6 and digit_val > 5:  # ones digit max 5
+                                    valid_input = False
+                                elif digit_val > 9:
+                                    valid_input = False
+                            
+                            if valid_input and j[thingy_thing]!=digit_val:
+                                j[thingy_thing]=digit_val
                             break
                         thingy_thing+=1
             elif event.type == pygame.KEYUP and not mem_in_settings:
