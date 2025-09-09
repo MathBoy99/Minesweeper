@@ -134,7 +134,7 @@ mines=Stuff[10]
 apple_tree=0
 gap=5
 apple_trees=30
-settings_buttons=[pygame.Rect(0,0,scaled_size,scaled_size),pygame.Rect(scaled_size,0,scaled_size,scaled_size),pygame.Rect(0,scaled_size+gap,scaled_size,scaled_size+gap),pygame.Rect(scaled_size,scaled_size+gap,scaled_size,scaled_size),pygame.Rect(apple_trees,scaled_size*2+gap*2,scaled_size+apple_trees,scaled_size+gap*2),pygame.Rect(scaled_size+apple_trees,scaled_size*2+gap*2,scaled_size+apple_trees,scaled_size+gap*2),pygame.Rect(0,scaled_size*3+gap*3,scaled_size,scaled_size+gap*3),pygame.Rect(scaled_size,scaled_size*3+gap*3,scaled_size,scaled_size+gap*3),pygame.Rect(scaled_size*2,scaled_size*3+gap*3,scaled_size,scaled_size+gap*3)]
+settings_buttons=[pygame.Rect(0,0,scaled_size,scaled_size),pygame.Rect(scaled_size,0,scaled_size,scaled_size),pygame.Rect(0,scaled_size+gap,scaled_size,scaled_size),pygame.Rect(scaled_size,scaled_size+gap,scaled_size,scaled_size),pygame.Rect(apple_trees,scaled_size*2+gap*2,scaled_size,scaled_size),pygame.Rect(scaled_size+apple_trees,scaled_size*2+gap*2,scaled_size,scaled_size),pygame.Rect(0,scaled_size*3+gap*3,scaled_size,scaled_size),pygame.Rect(scaled_size,scaled_size*3+gap*3,scaled_size,scaled_size),pygame.Rect(scaled_size*2,scaled_size*3+gap*3,scaled_size,scaled_size)]
 for item in settings_buttons:
     item[1]+=45
     item[3]+=45
