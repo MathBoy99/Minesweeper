@@ -142,14 +142,14 @@ grid_length_buttons = [
 
 # Grid Height buttons (tens and ones digit)
 grid_height_buttons = [
-    pygame.Rect(0, scaled_size+gap, scaled_size, scaled_size+gap),
-    pygame.Rect(scaled_size, scaled_size+gap, scaled_size, scaled_size+gap)
+    pygame.Rect(0, scaled_size+gap, scaled_size, scaled_size),
+    pygame.Rect(scaled_size, scaled_size+gap, scaled_size, scaled_size)
 ]
 
 # Mine Density buttons (tenths and hundredths digit)
 mine_density_buttons = [
-    pygame.Rect(apple_trees, scaled_size*2+gap*2, scaled_size+apple_trees, scaled_size*3+gap*2),
-    pygame.Rect(scaled_size+apple_trees, scaled_size*2+gap*2, scaled_size+apple_trees, scaled_size*3+gap*2)
+    pygame.Rect(apple_trees, scaled_size*2+gap*2, scaled_size, scaled_size),
+    pygame.Rect(scaled_size+apple_trees, scaled_size*2+gap*2, scaled_size, scaled_size)
 ]
 
 # Scale Factor buttons (ones, tenths, and hundredths digit)
