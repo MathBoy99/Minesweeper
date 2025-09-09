@@ -132,40 +132,22 @@ grid=Stuff[8]
 hide_grid=Stuff[9]
 mines=Stuff[10]
 apple_tree=0
-gap=5
-apple_trees=30
-# Grid Length buttons (tens and ones digit)
-grid_length_buttons = [
-    pygame.Rect(0, 0, scaled_size, scaled_size),
-    pygame.Rect(scaled_size, 0, scaled_size*2, scaled_size)
-]
+gap=2
+settings_buttons=[
+                  pygame.Rect(0,0,scaled_size,scaled_size),
+                  pygame.Rect(scaled_size,0,scaled_size,scaled_size),
+                  pygame.Rect(0,scaled_size+gap,scaled_size,scaled_size),
+                  pygame.Rect(scaled_size,scaled_size+gap,scaled_size,scaled_size),
+                  pygame.Rect(25,scaled_size*2+gap*2,scaled_size,scaled_size),
+                  pygame.Rect(25+scaled_size,scaled_size*2+gap*2,scaled_size,scaled_size),
+                  pygame.Rect(0,scaled_size*3+gap*3,scaled_size,scaled_size),
+                  pygame.Rect(scaled_size,scaled_size*3+gap*3,scaled_size,scaled_size),
+                  pygame.Rect(scaled_size*2,scaled_size*3+gap*3,scaled_size,scaled_size)
+                 ]
 
-# Grid Height buttons (tens and ones digit)
-grid_height_buttons = [
-    pygame.Rect(0, scaled_size+gap, scaled_size, scaled_size*2+gap),
-    pygame.Rect(scaled_size, scaled_size+gap, scaled_size*2, scaled_size*2+gap)
-]
-
-# Mine Density buttons (tenths and hundredths digit)
-mine_density_buttons = [
-    pygame.Rect(apple_trees, scaled_size*2+gap*2, scaled_size+apple_trees, scaled_size*3+gap*2),
-    pygame.Rect(scaled_size+apple_trees, scaled_size*2+gap*2, scaled_size*2+apple_trees, scaled_size*3+gap*2)
-]
-
-# Scale Factor buttons (ones, tenths, and hundredths digit)
-scale_factor_buttons = [
-    pygame.Rect(0, scaled_size*3+gap*3, scaled_size, scaled_size*4+gap*3),
-    pygame.Rect(scaled_size, scaled_size*3+gap*3, scaled_size*2, scaled_size*4+gap*3),
-    pygame.Rect(scaled_size*2, scaled_size*3+gap*3, scaled_size*3, scaled_size*4+gap*3)
-]
-
-# Combine all buttons into settings_buttons list
-settings_buttons = grid_length_buttons + grid_height_buttons + mine_density_buttons + scale_factor_buttons
 for item in settings_buttons:
-    item[1]+=45
-    item[3]+=45
     item[0]+=210
-    item[2]+=210
+    item[1]+=45
 
 settings_buttons_meaning=["grid_length_tens_digit","grid_length_ones_digit","grid_height_tens_digit","grid_height_ones_digit","mine_density_tens_digit","mine_density_ones_digit","scale_factor_ones_digit","scale_factor_tenths_digit","scale_factor_hundredths_digit"]
 j=[2,4,1,6,1,9,1,0,0]
@@ -193,8 +175,9 @@ in_settings = False
 text_list = [
   {"text": "Settings", "position": (0, 0), "font_size": 48},
   {"text": "Grid Length:", "position": (0, 50), "font_size": 24},
-  {"text": "Grid Height:", "position": (0, 50+scaled_size+gap), "font_size": 24},
+  {"text": "Grid Height:", "position": (0, 50+scaled_size+gap), "font_size": 24},\
   {"text": "Mine Density:", "position": (0, 50+scaled_size*2+gap*2), "font_size": 24},
+  {"text": "Scale Factor:", "position": (0, 50+scaled_size*3+gap*3), "font_size": 24}
 ]
 rendered_texts = []
 for item in text_list:
@@ -522,7 +505,6 @@ while running:
                         if item.collidepoint(mousex,mousey):
                             if j[thingy_thing]!=int(f"{event.unicode}"):
                                 j[thingy_thing]=int(f"{event.unicode}")
-                            break
                         thingy_thing+=1
             elif event.type == pygame.KEYUP and not mem_in_settings:
                 mem_in_settings=True
