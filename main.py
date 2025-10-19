@@ -7,6 +7,10 @@ import sys
 pygame.font.init()
 changed=False
 ete=0
+settings_temp_vari=False
+controls_temp_vari=False
+allow_anything=False
+better_grid_gen=True
 # Base grid_length is 24
 grid_length = 24
 # Base grid_height is 16
@@ -171,25 +175,53 @@ flagged=mines
 sad=[0,0]
 bad=[]
 running = True
-in_settings = False
+in_settings = True
 text_list = [
   {"text": "Settings", "position": (0, 0), "font_size": 48},
   {"text": "Grid Length:", "position": (0, 50), "font_size": 24},
   {"text": "Grid Height:", "position": (0, 50+scaled_size+gap), "font_size": 24},\
   {"text": "Mine Density:", "position": (0, 50+scaled_size*2+gap*2), "font_size": 24},
-  {"text": "Scale Factor:", "position": (0, 50+scaled_size*3+gap*3), "font_size": 24}
+  {"text": "Scale Factor:", "position": (0, 50+scaled_size*3+gap*3), "font_size": 24},
+  {"text": "Welcome to Minesweeper each number tells you", "position": (0, 80+scaled_size*4+gap*4), "font_size": 24},
+  {"text": "how many mines are adjacent to it your goal is", "position": (0, 80+scaled_size*5+gap*5), "font_size": 24},
+  {"text": "to find all the mines you can flag a mine when", "position": (0, 80+scaled_size*6+gap*6), "font_size": 24},
+  {"text": "you find it this version also has a special", "position": (0, 80+scaled_size*7+gap*7), "font_size": 24},
+  {"text": "feature called guess flags you can use a guess", "position": (0, 80+scaled_size*8+gap*8), "font_size": 24},
+  {"text": "flag to say it could be here or it could be here.", "position": (0, 80+scaled_size*9+gap*9), "font_size": 24},
+  {"text": "To change any value here hover over with ", "position": (0, 80+scaled_size*11+gap*11), "font_size": 24},
+  {"text": "your mouse and click a number to change the", "position": (0, 80+scaled_size*12+gap*12), "font_size": 24},
+  {"text": "value you can also press s to exit settings", "position": (0, 80+scaled_size*13+gap*13), "font_size": 24},
+  {"text": "and c to see controls", "position": (0, 80+scaled_size*14+gap*14), "font_size": 24}
+]
+control_text_list=[
+    {"text": "Controls", "position": (0, 0), "font_size": 48},
+    {"text": "F: Flag", "position": (0, 50), "font_size": 24},
+    {"text": "D: Reveal", "position": (0, 50+scaled_size+gap), "font_size": 24},
+    {"text": "R: Reset", "position": (0, 50+scaled_size*2+gap*2), "font_size": 24},
+    {"text": "P: Print Stats to console", "position": (0, 50+scaled_size*3+gap*3), "font_size": 24},
+    {"text": "K: Generate Grids (click d on empty tile)", "position": (0, 50+scaled_size*4+gap*4), "font_size": 24},
+    {"text": "L: Generate Grids stops when 8 tile is found", "position": (0, 50+scaled_size*5+gap*5), "font_size": 24},
+    {"text": "M: Stop Generating Grids", "position": (0, 50+scaled_size*6+gap*6), "font_size": 24},
+    {"text": "1-4: Guess Flags 1-4", "position": (0, 50+scaled_size*7+gap*7), "font_size": 24},
+    {"text": "S: Exit/Enter Settings", "position": (0, 50+scaled_size*8+gap*8), "font_size": 24},
+    {"text": "C: Exit/Enter Controls", "position": (0, 50+scaled_size*9+gap*9), "font_size": 24}
 ]
 rendered_texts = []
+rendered_control_texts=[]
 for item in text_list:
   custom_font = pygame.font.Font('font.ttf', item["font_size"])
   text_surface = custom_font.render(item["text"], True, (255, 255, 255))
   rendered_texts.append({"surface": text_surface, "position": item["position"]})
-
-
+for item in control_text_list:
+    custom_font = pygame.font.Font('font.ttf', item["font_size"])
+    text_surface = custom_font.render(item["text"], True, (255, 255, 255))
+    rendered_control_texts.append({"surface": text_surface, "position": item["position"]})
+about_to_see_controls=False
+see_controls=False
 while running:
     time.sleep(0.01)
     screen.fill(fill)
-    if not in_settings:
+    if not in_settings and not see_controls:
         iteration = 0
         if not grid_length*grid_height*mine_density>99:
             flag=str(flagged)
@@ -269,6 +301,8 @@ while running:
                         guess_flag_help=4
                     elif event.key == pygame.K_s:
                         apple_tree=2
+                    elif event.key == pygame.K_c:
+                        about_to_see_controls=True
                 elif ete==2 and event.type==pygame.KEYUP and grids_generated>0:
                     y=-1
                     ete=0
@@ -291,10 +325,13 @@ while running:
                     print("The average number is: "+str(round(asdjk/sum(listy_list),4)))
                     print("")
                     print("Number of grids generated: "+str(grids_generated))
-                elif apple_tree==2 and event.type==pygame.KEYUP:
+                elif apple_tree==2 and event.type==pygame.KEYUP and not about_to_see_controls:
                     apple_tree=0
                     changed=False
                     in_settings = True
+                elif about_to_see_controls and event.type==pygame.KEYUP and apple_tree!=2:
+                    about_to_see_controls=False
+                    see_controls=True
             if pl:
                 if r:
                     grid=[]
@@ -328,12 +365,23 @@ while running:
                     index=get_index(pygame.mouse.get_pos()[0],pygame.mouse.get_pos()[1],grid_length,grid_height,scaled_size)
                     if str(index)!=":(" and (len(grid)-1) >= index and index>-1 and hide_grid[index]==1:
                         if not started:
+                            index=int(index)
                             do_go=list(range(len(grid)))
                             do_go.remove(index)
                             hide_grid[index]=0
                             for item in adjecent:
                                 if item+index>=0 and item+index<len(grid):
                                     do_go.remove(item+index)
+                            allowed_adjecent=[]
+                            for item in adjecent:
+                                if item+index<=(len(grid)-1) and item+index>=0:
+                                    allowed_adjecent.append(item)
+                            if better_grid_gen:
+                                thing_thing=random.sample(allowed_adjecent,random.randint(1,3))
+                                for item in thing_thing:
+                                    for thingy_mbob in adjecent:
+                                        if item+index+thingy_mbob in do_go:
+                                            do_go.remove(item+index+thingy_mbob)
                             for item in range(mines):
                                 three=(random.sample(do_go,1))[0]
                                 grid[three]=0
@@ -475,8 +523,19 @@ while running:
                     elif event.key == pygame.K_p:
                         ete=2
                     elif event.key == pygame.K_s:
-                        in_settings = True
+                        apple_tree=2
+                        about_to_see_controls=False
+                    elif event.key == pygame.K_c:
+                        about_to_see_controls=True
                         apple_tree=0
+                elif event.type == pygame.KEYUP:
+                    if apple_tree==2:
+                        apple_tree=0
+                        changed=False
+                        in_settings = True
+                    elif about_to_see_controls:
+                        about_to_see_controls=False
+                        see_controls=True
     elif in_settings:
         for item in settings_buttons:
             screen.blit(settings_tiles_in_order[j[settings_buttons.index(item)]], (item.x, item.y))
@@ -506,11 +565,16 @@ while running:
                             if j[thingy_thing]!=int(f"{event.unicode}"):
                                 j[thingy_thing]=int(f"{event.unicode}")
                         thingy_thing+=1
-            elif event.type == pygame.KEYUP and not mem_in_settings:
+                elif event.key == pygame.K_c:
+                    settings_temp_vari=True
+            elif event.type == pygame.KEYUP and (not mem_in_settings or settings_temp_vari):
                 mem_in_settings=True
                 if j[0]*10+j[1]!=grid_length or j[2]*10+j[3]!=grid_height or (j[4]/10+j[5]/100)!=mine_density or j[6]+j[7]/10+j[8]/100!=scale_factor:
                     changed=True
                 if changed:
+                    if j[4]*10+j[5]>50 and not allow_anything:
+                        j[4]=5
+                        j[5]=0
                     Stuff=start_program_math(j[0]*10+j[1],j[2]*10+j[3],(j[4]/10+j[5]/100),j[6]+j[7]/10+j[8]/100)
                     guess_flag_help=Stuff[0]
                     listy_list=Stuff[1]
@@ -533,8 +597,36 @@ while running:
                     grids_generated=0
                     grids_with=[0,0,0,0,0,0,0,0,0]
                     play=True
+                    if min(grid_length,grid_height)<=5:
+                        better_grid_gen=False
+                    else:
+                        better_grid_gen=True
+                    if mine_density<0.1:
+                        mine_density=0.1
+                        j[4]=1
+                        j[5]=0
+                        mines=round(grid_length*grid_height*mine_density)
+                if settings_temp_vari:
+                    settings_temp_vari=False
+                    see_controls=True
                 in_settings=False
                 changed=False
-                
+    elif see_controls:
+        for rendered_item in rendered_control_texts:
+            screen.blit(rendered_item["surface"], rendered_item["position"])
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                running = False
+            elif event.type == pygame.KEYDOWN:
+                if event.key == pygame.K_ESCAPE:
+                    running = False
+                elif event.key == pygame.K_c:
+                    see_controls=False
+                elif event.key == pygame.K_s:
+                    controls_temp_vari=True
+            elif event.type == pygame.KEYUP and controls_temp_vari:
+                controls_temp_vari=False
+                see_controls=False
+                in_settings=True
     pygame.display.flip()
 pygame.quit()
