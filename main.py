@@ -33,7 +33,7 @@ def load_image(image_name, cell_size, scale_factor):
 
 screen = pygame.display.set_mode((grid_size), pygame.NOFRAME)
 
-def get_index(mouse_x,mouse_y,grid_length,grid_height,size):
+def get_index(mouse_x,mouse_y,grid_length,grid_height,size,pos):
     gridx = (grid_length+1)*size
     gridy = (grid_height+1)*size
     iteration=-1
@@ -41,13 +41,13 @@ def get_index(mouse_x,mouse_y,grid_length,grid_height,size):
     thing2=grid_height+1
     for item in range(round(size),gridx, round(size)):
         iteration+=1
-        if mouse_x < item:
+        if mouse_x-pos[0] < item:
             thing1=iteration
             break
     iteration=-1
     for item in range(round(size),gridy, round(size)):
         iteration+=1
-        if mouse_y < item:
+        if mouse_y-pos[1] < item:
             thing2=iteration
             break
     if thing1<=grid_length-1 and thing2<=grid_height-1:
@@ -78,6 +78,7 @@ def new_hide_grid(grid_lengthy,gridy,hide_gridy,empty_index):
     return hide_gridy
 mem_in_settings=False
 def start_program_math(grid_length,grid_height,mine_density,scale_factor):
+    camera_exists=False
     guess_flag_help=0
     if grid_length*grid_height*mine_density>99:
         flagged_length=grid_length
@@ -112,14 +113,15 @@ def start_program_math(grid_length,grid_height,mine_density,scale_factor):
     green=load_image('Green_Flag.png', cell_size, scale_factor)
     Blue=load_image('Blue_Flag.png', cell_size, scale_factor)
     guess_flags=[Purple,yelllow,green,Blue]
-    
+    if cell_size*scale_factor*grid_length>grid_size[0]:
+        camera_exists=True
     grid=[]
     hide_grid=[]
     for i in range(grid_length*grid_height):
         grid.append(random.randint(1,8))
         hide_grid.append(1)
     mines=round(grid_length*grid_height*mine_density)
-    return guess_flag_help,listy_list,wordy_word,cell_size,scaled_size,img_list,tiles_in_order,guess_flags,grid,hide_grid,mines
+    return guess_flag_help,listy_list,wordy_word,cell_size,scaled_size,img_list,tiles_in_order,guess_flags,grid,hide_grid,mines, camera_exists
 Stuff=start_program_math(grid_length,grid_height,mine_density,scale_factor)
 guess_flag_help=Stuff[0]
 listy_list=Stuff[1]
@@ -135,6 +137,7 @@ settings_guess_flags=Stuff[7]
 grid=Stuff[8]
 hide_grid=Stuff[9]
 mines=Stuff[10]
+camera_exists=Stuff[11]
 apple_tree=0
 gap=2
 settings_buttons=[
@@ -161,7 +164,26 @@ times=0
 started = False
 def get_adjacent(grid_length):
     return [1,-1,grid_length,-grid_length,grid_length+1,grid_length-1,-grid_length+1,-grid_length-1]
-
+camera_pos=[0,0]
+def move_camera(direction,pos):
+    move=scaled_size/6
+    if direction=="left":
+        pos[0]+=move
+    elif direction=="right":
+        pos[0]-=move
+    elif direction=="up":
+        pos[1]+=move
+    elif direction=="down":
+        pos[1]-=move
+    if pos[0]>0:
+        pos[0]=0
+    elif pos[1]>0:
+        pos[1]=0
+    if pos[0]<(grid_size[0]-scaled_size*grid_length):
+        pos[0]=grid_size[0]-scaled_size*grid_length
+    elif pos[1]<(grid_size[1]-scaled_size*grid_height):
+        pos[1]=grid_size[1]-scaled_size*grid_height
+    return pos
 adjecent = get_adjacent(grid_length)
 play=True
 r=True
@@ -204,7 +226,9 @@ control_text_list=[
     {"text": "M: Stop Generating Grids", "position": (0, 50+scaled_size*6+gap*6), "font_size": 24},
     {"text": "1-4: Guess Flags 1-4", "position": (0, 50+scaled_size*7+gap*7), "font_size": 24},
     {"text": "S: Exit/Enter Settings", "position": (0, 50+scaled_size*8+gap*8), "font_size": 24},
-    {"text": "C: Exit/Enter Controls", "position": (0, 50+scaled_size*9+gap*9), "font_size": 24}
+    {"text": "C: Exit/Enter Controls", "position": (0, 50+scaled_size*9+gap*9), "font_size": 24},
+    {"text": "Arrow Keys: Move Camera (only in grids where", "position": (0, 50+scaled_size*10+gap*10), "font_size": 24},
+    {"text": "camera is needed)", "position": (0, 50+scaled_size*11+gap*11), "font_size": 24}
 ]
 rendered_texts = []
 rendered_control_texts=[]
@@ -239,8 +263,8 @@ while running:
         for row in range(grid_height):
             for col in range(grid_length):
                 if iteration < grid_length*grid_height:
-                    x = col * scaled_size
-                    y = row * scaled_size
+                    x = (col * scaled_size)+camera_pos[0]
+                    y = (row * scaled_size)+camera_pos[1]
                     if hide_grid[iteration]==0:
                         thing = img_list[grid[iteration]]
                     elif hide_grid[iteration]==1:
@@ -251,6 +275,16 @@ while running:
                         thing = guess_flags[hide_grid[iteration]-3]
                     screen.blit(thing, (x, y))
                 iteration+=1
+        if camera_exists:
+            keys = pygame.key.get_pressed()
+            if keys[pygame.K_LEFT]:
+                camera_pos=move_camera("left",camera_pos)
+            if keys[pygame.K_RIGHT]:
+                camera_pos=move_camera("right",camera_pos)
+            if keys[pygame.K_UP]:
+                camera_pos=move_camera("up",camera_pos)
+            if keys[pygame.K_DOWN]:
+                camera_pos=move_camera("down",camera_pos)
         if play or gen_grids:
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
@@ -351,7 +385,7 @@ while running:
                 if times>7:
                     times=0
                     if started:
-                        index=get_index(pygame.mouse.get_pos()[0],pygame.mouse.get_pos()[1],grid_length,grid_height,scaled_size)
+                        index=get_index(pygame.mouse.get_pos()[0],pygame.mouse.get_pos()[1],grid_length,grid_height,scaled_size,camera_pos)
                         if str(index) !=":(":
                             index=int(index)
                             if hide_grid[index]==1 or hide_grid[index]>2:
@@ -362,7 +396,7 @@ while running:
                                 flagged+=1
                 else:
                     times=0
-                    index=get_index(pygame.mouse.get_pos()[0],pygame.mouse.get_pos()[1],grid_length,grid_height,scaled_size)
+                    index=get_index(pygame.mouse.get_pos()[0],pygame.mouse.get_pos()[1],grid_length,grid_height,scaled_size,camera_pos)
                     if str(index)!=":(" and (len(grid)-1) >= index and index>-1 and hide_grid[index]==1:
                         if not started:
                             index=int(index)
@@ -464,7 +498,7 @@ while running:
                                     fill=[0,120,120]
             else:
                 if guess_flag_help>0 and event.type == pygame.KEYUP and started:
-                    index=get_index(pygame.mouse.get_pos()[0],pygame.mouse.get_pos()[1],grid_length,grid_height,scaled_size)
+                    index=get_index(pygame.mouse.get_pos()[0],pygame.mouse.get_pos()[1],grid_length,grid_height,scaled_size,camera_pos)
                     if str(index)!=":(":
                         index=int(index)
                         if hide_grid[index]==2:
@@ -587,6 +621,7 @@ while running:
                     grid=Stuff[8]
                     hide_grid=Stuff[9]
                     mines=Stuff[10]
+                    camera_exists=Stuff[11]
                     flagged=mines
                     grid_length=j[0]*10+j[1]
                     grid_height=j[2]*10+j[3]
@@ -597,6 +632,7 @@ while running:
                     grids_generated=0
                     grids_with=[0,0,0,0,0,0,0,0,0]
                     play=True
+                    camera_pos=[0,0]
                     if min(grid_length,grid_height)<=5:
                         better_grid_gen=False
                     else:
