@@ -263,13 +263,11 @@ while running:
         for row in range(grid_height):
             for col in range(grid_length):
                 if iteration < grid_length*grid_height:
-                    x = (col * scaled_size)
-                    y = (row * scaled_size)
+                    x = (col * scaled_size)+camera_pos[0]
+                    y = (row * scaled_size)+camera_pos[1]
                     #only actually draws stuff if it is on the screen according to the camera position and the grid size
-                    screen_x = x + camera_pos[0]
-                    screen_y = y + camera_pos[1]
-                    if screen_x + scaled_size >= 0 and screen_x < grid_size[0]:
-                        if screen_y + scaled_size >= 0 and screen_y < grid_size[1]:
+                    if x+scaled_size>=0 and x<=grid_size[0]
+                        if y+scaled_size>=0 and y<=grid_size[1]
                             if hide_grid[iteration]==0:
                                 thing = img_list[grid[iteration]]
                             elif hide_grid[iteration]==1:
@@ -278,7 +276,7 @@ while running:
                                 thing = img_list[9]
                             else:
                                 thing = guess_flags[hide_grid[iteration]-3]
-                            screen.blit(thing, (screen_x, screen_y))
+                            screen.blit(thing, (x, y))
                 iteration+=1
         if camera_exists:
             keys = pygame.key.get_pressed()
