@@ -266,8 +266,9 @@ while running:
                     x = (col * scaled_size)+camera_pos[0]
                     y = (row * scaled_size)+camera_pos[1]
                     #only actually draws stuff if it is on the screen according to the camera position and the grid size
-                    if x+scaled_size>=0 and x<=grid_size[0]
-                        if y+scaled_size>=0 and y<=grid_size[1]
+                    margin = scaled_size // 2
+                    if x+scaled_size-margin>=0 and x+margin<=grid_size[0]:
+                        if y+scaled_size-margin>=0 and y+margin<=grid_size[1]:
                             if hide_grid[iteration]==0:
                                 thing = img_list[grid[iteration]]
                             elif hide_grid[iteration]==1:
