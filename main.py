@@ -200,7 +200,7 @@ def get_cameras_sight(camera_pos):
     for x in range(top_left[0],bottom_right[0]):
         for y in range(top_left[1],bottom_right[1]):
             camera_hide_grid.append(hide_grid[x+y*grid_length])
-            camera_grid.append(grid[item])
+            camera_grid.append(grid[x+y*grid_length])
     return camera_hide_grid,camera_grid
 camera_sight_hide_grid=[]
 camera_sight_grid=[]
@@ -323,6 +323,7 @@ while running:
             #draws the grid according to the camera position and the new camera sight and camera sight hide grid
             cam_length=grid_size[0]//scaled_size
             cam_height=grid_size[1]//scaled_size
+            iteration=0
             for row in range(cam_height):
                 for col in range(cam_length):
                     if iteration < cam_length*cam_height:
@@ -337,6 +338,7 @@ while running:
                         else:
                             thing = guess_flags[camera_sight_hide_grid[iteration]-3]
                         screen.blit(thing, (x, y))
+                        iteration+=1
         if play or gen_grids:
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
@@ -548,6 +550,10 @@ while running:
                                     print("You won")
                                     r=True
                                     fill=[0,120,120]
+                if index!=":(":
+                    temp=get_cameras_sight(camera_pos)
+                    camera_sight_hide_grid=temp[0]
+                    camera_sight_grid=temp[1]
             else:
                 if guess_flag_help>0 and event.type == pygame.KEYUP and started:
                     index=get_index(pygame.mouse.get_pos()[0],pygame.mouse.get_pos()[1],grid_length,grid_height,scaled_size,camera_pos)
