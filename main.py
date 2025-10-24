@@ -184,6 +184,20 @@ def move_camera(direction,pos):
     elif pos[1]<(grid_size[1]-scaled_size*grid_height):
         pos[1]=grid_size[1]-scaled_size*grid_height
     return pos
+def get_cameras_sight(camera_pos):
+    camera_hide_grid=[]
+    camera_grid=[]
+    top_left=get_index(camera_pos[0],camera_pos[1],grid_length,grid_height,scaled_size,camera_pos)
+    top_left=[top_left%grid_length,top_left//grid_length]
+    bottom_right=get_index(camera_pos[0]+grid_size[0],camera_pos[1]+grid_size[1],grid_length,grid_height,scaled_size,camera_pos)
+    bottom_right=[bottom_right%grid_length,bottom_right//grid_length]
+    for item in range(top_left[0],bottom_right[0]):
+        for item in range(top_left[1],bottom_right[1]):
+            camera_hide_grid.append(hide_grid[item])
+            camera_grid.append(grid[item])
+    return camera_hide_grid,camera_grid
+camera_sight_hide_grid=[]
+camera_sight_grid=[]
 adjecent = get_adjacent(grid_length)
 play=True
 r=True
@@ -260,34 +274,63 @@ while running:
             for item in sad:
                 ruey+=scaled_size
                 screen.blit(tiles_in_order[item], ((scaled_size*grid_length)+ruey, 0))
-        for row in range(grid_height):
-            for col in range(grid_length):
-                if iteration < grid_length*grid_height:
-                    x = (col * scaled_size)+camera_pos[0]
-                    y = (row * scaled_size)+camera_pos[1]
-                    #only actually draws stuff if it is on the screen according to the camera position and the grid size
-                    if x+scaled_size>=0 and x<=grid_size[0]:
-                        if y+scaled_size>=0 and y<=grid_size[1]:
-                            if hide_grid[iteration]==0:
-                                thing = img_list[grid[iteration]]
-                            elif hide_grid[iteration]==1:
-                                thing = img_list[11]
-                            elif hide_grid[iteration]==2:
-                                thing = img_list[9]
-                            else:
-                                thing = guess_flags[hide_grid[iteration]-3]
-                            screen.blit(thing, (x, y))
-                iteration+=1
-        if camera_exists:
+        if not camera_exists:
+            for row in range(grid_height):
+                for col in range(grid_length):
+                    if iteration < grid_length*grid_height:
+                        x = (col * scaled_size)+camera_pos[0]
+                        y = (row * scaled_size)+camera_pos[1]
+                        #only actually draws stuff if it is on the screen according to the camera position and the grid size
+                        if hide_grid[iteration]==0:
+                            thing = img_list[grid[iteration]]
+                        elif hide_grid[iteration]==1:
+                            thing = img_list[11]
+                        elif hide_grid[iteration]==2:
+                            thing = img_list[9]
+                        else:
+                            thing = guess_flags[hide_grid[iteration]-3]
+                        screen.blit(thing, (x, y))
+                    iteration+=1
+        elif camera_exists:
             keys = pygame.key.get_pressed()
             if keys[pygame.K_LEFT]:
                 camera_pos=move_camera("left",camera_pos)
+                temp=get_cameras_sight(camera_pos)
+                camera_sight_hide_grid=temp[0]
+                camera_sight_grid=temp[1]
             if keys[pygame.K_RIGHT]:
                 camera_pos=move_camera("right",camera_pos)
+                temp=get_cameras_sight(camera_pos)
+                camera_sight_hide_grid=temp[0]
+                camera_sight_grid=temp[1]
             if keys[pygame.K_UP]:
                 camera_pos=move_camera("up",camera_pos)
+                temp=get_cameras_sight(camera_pos)
+                camera_sight_hide_grid=temp[0]
+                camera_sight_grid=temp[1]
             if keys[pygame.K_DOWN]:
                 camera_pos=move_camera("down",camera_pos)
+                temp=get_cameras_sight(camera_pos)
+                camera_sight_hide_grid=temp[0]
+                camera_sight_grid=temp[1]
+            temp=[]
+            #draws the grid according to the camera position and the new camera sight and camera sight hide grid
+            cam_length=grid_size[0]//scaled_size
+            cam_height=grid_size[1]//scaled_size
+            for row in range(cam_height):
+                for col in range(cam_length):
+                    if iteration < cam_length*cam_height:
+                        x = (col * scaled_size)+camera_pos[0]
+                        y = (row * scaled_size)+camera_pos[1]
+                        if camera_sight_hide_grid[iteration]==0:
+                            thing = img_list[camera_sight_grid[iteration]]
+                        elif camera_sight_hide_grid[iteration]==1:
+                            thing = img_list[11]
+                        elif camera_sight_hide_grid[iteration]==2:
+                            thing = img_list[9]
+                        else:
+                            thing = guess_flags[camera_sight_hide_grid[iteration]-3]
+                        screen.blit(thing, (x, y))
         if play or gen_grids:
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
@@ -661,6 +704,9 @@ while running:
                     #changes the camera pos proportionally to the scale factor
                     camera_pos[0]=camera_pos[0]*(scale_factor/mem_scale_factor)
                     camera_pos[1]=camera_pos[1]*(scale_factor/mem_scale_factor)
+                temp=get_cameras_sight(camera_pos)
+                camera_sight_hide_grid=temp[0]
+                camera_sight_grid=temp[1]
                 if settings_temp_vari:
                     settings_temp_vari=False
                     see_controls=True
