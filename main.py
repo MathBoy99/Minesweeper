@@ -187,12 +187,12 @@ def move_camera(direction,pos):
 def get_cameras_sight(camera_pos):
     camera_hide_grid=[]
     camera_grid=[]
-    top_left=get_index(-camera_pos[0],-camera_pos[1],grid_length,grid_height,scaled_size,[0,0])
+    top_left=get_index(camera_pos[0]*2,camera_pos[1]*2,grid_length,grid_height,scaled_size,camera_pos)
     if top_left!=":(":
         top_left=[top_left%grid_length,top_left//grid_length]
     else:
         top_left=[0,0]
-    bottom_right=get_index(-camera_pos[0]+grid_size[0],-camera_pos[1]+grid_size[1],grid_length,grid_height,scaled_size,[0,0])
+    bottom_right=get_index(camera_pos[0]*2+grid_size[0],camera_pos[1]+grid_size[1],grid_length,grid_height,scaled_size,camera_pos)
     if bottom_right!=":(":   
         bottom_right=[bottom_right%grid_length,bottom_right//grid_length]
     else:
