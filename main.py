@@ -188,9 +188,14 @@ def get_cameras_sight(camera_pos):
     camera_hide_grid=[]
     camera_grid=[]
     top_left=get_index(camera_pos[0],camera_pos[1],grid_length,grid_height,scaled_size,camera_pos)
-    top_left=[top_left%grid_length,top_left//grid_length]
+    if top_left!=":(":
+        top_left=[top_left%grid_length,top_left//grid_length]
+    else:
+        top_left=[0,0]
     bottom_right=get_index(camera_pos[0]+grid_size[0],camera_pos[1]+grid_size[1],grid_length,grid_height,scaled_size,camera_pos)
-    bottom_right=[bottom_right%grid_length,bottom_right//grid_length]
+    if bottom_right!=":(":   
+        bottom_right=[bottom_right%grid_length,bottom_right//grid_length]
+    else
     for item in range(top_left[0],bottom_right[0]):
         for item in range(top_left[1],bottom_right[1]):
             camera_hide_grid.append(hide_grid[item])
