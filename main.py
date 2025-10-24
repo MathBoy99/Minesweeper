@@ -606,7 +606,7 @@ while running:
                     settings_temp_vari=True
             elif event.type == pygame.KEYUP and (not mem_in_settings or settings_temp_vari):
                 mem_in_settings=True
-                if j[0]*10+j[1]!=grid_length or j[2]*10+j[3]!=grid_height or (j[4]/10+j[5]/100)!=mine_density or j[6]+j[7]/10+j[8]/100!=scale_factor:
+                if j[0]*10+j[1]!=grid_length or j[2]*10+j[3]!=grid_height or (j[4]/10+j[5]/100)!=mine_density:
                     changed=True
                 if changed:
                     if j[4]*10+j[5]>50 and not allow_anything:
@@ -645,6 +645,22 @@ while running:
                         j[4]=1
                         j[5]=0
                         mines=round(grid_length*grid_height*mine_density)
+                #just changes the size of the cells for scale factor if only it was changed
+                if j[6]+j[7]/10+j[8]/100!=scale_factor and not changed:
+                    Stuff=start_program_math(grid_length,grid_height,mine_density,j[6]+j[7]/10+j[8]/100)
+                    guess_flag_help=Stuff[0]
+                    listy_list=Stuff[1]
+                    wordy_word=Stuff[2]
+                    cell_size=Stuff[3]
+                    scaled_size=Stuff[4]
+                    img_list=Stuff[5]
+                    tiles_in_order=Stuff[6]
+                    guess_flags=Stuff[7]
+                    camera_exists=Stuff[11]
+                    scale_factor=j[6]+j[7]/10+j[8]/100
+                    #changes the camera pos proportionally to the scale factor
+                    camera_pos[0]=camera_pos[0]*(scale_factor/mem_scale_factor)
+                    camera_pos[1]=camera_pos[1]*(scale_factor/mem_scale_factor)
                 if settings_temp_vari:
                     settings_temp_vari=False
                     see_controls=True
