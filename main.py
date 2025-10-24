@@ -11,6 +11,7 @@ settings_temp_vari=False
 controls_temp_vari=False
 allow_anything=False
 better_grid_gen=True
+offset=[0,0]
 # Base grid_length is 24
 grid_length = 24
 # Base grid_height is 16
@@ -34,22 +35,8 @@ def load_image(image_name, cell_size, scale_factor):
 screen = pygame.display.set_mode((grid_size), pygame.NOFRAME)
 
 def get_index(mouse_x,mouse_y,grid_length,grid_height,size,pos):
-    gridx = (grid_length+1)*size
-    gridy = (grid_height+1)*size
-    iteration=-1
-    thing1=grid_length+1
-    thing2=grid_height+1
-    for item in range(round(size),gridx, round(size)):
-        iteration+=1
-        if mouse_x-pos[0] < item:
-            thing1=iteration
-            break
-    iteration=-1
-    for item in range(round(size),gridy, round(size)):
-        iteration+=1
-        if mouse_y-pos[1] < item:
-            thing2=iteration
-            break
+    thing1=int((mouse_x-pos[0])//scaled_size)
+    thing2=int((mouse_y-pos[1])//scaled_size)
     if thing1<=grid_length-1 and thing2<=grid_height-1:
         return thing1+thing2*grid_length
     else:
@@ -166,6 +153,7 @@ def get_adjacent(grid_length):
     return [1,-1,grid_length,-grid_length,grid_length+1,grid_length-1,-grid_length+1,-grid_length-1]
 camera_pos=[0,0]
 def move_camera(direction,pos):
+    global offset
     move=scaled_size/6
     if direction=="left":
         pos[0]+=move
@@ -183,24 +171,28 @@ def move_camera(direction,pos):
         pos[0]=grid_size[0]-scaled_size*grid_length
     elif pos[1]<(grid_size[1]-scaled_size*grid_height):
         pos[1]=grid_size[1]-scaled_size*grid_height
+    offset=[(pos[0]%scaled_size)*-1,(pos[1]%scaled_size)*-1]
+    if offset[0]!=0:
+        offset[0]=(scaled_size+offset[0])*-1
+    if offset[1]!=0:
+        offset[1]=(scaled_size+offset[1])*-1
     return pos
 def get_cameras_sight(camera_pos):
     camera_hide_grid=[]
     camera_grid=[]
-    top_left=get_index(camera_pos[0]*2,camera_pos[1]*2,grid_length,grid_height,scaled_size,camera_pos)
+    top_left=get_index(0-camera_pos[0],0-camera_pos[1],grid_length,grid_height,scaled_size,(0,0))
     if top_left!=":(":
         top_left=[top_left%grid_length,top_left//grid_length]
     else:
         top_left=[0,0]
-    bottom_right=get_index(camera_pos[0]*2+grid_size[0],camera_pos[1]+grid_size[1],grid_length,grid_height,scaled_size,camera_pos)
-    if bottom_right!=":(":   
-        bottom_right=[bottom_right%grid_length,bottom_right//grid_length]
-    else:
-        bottom_right=[grid_length,grid_height]
+    cam_length=(grid_size[0]//scaled_size)+2
+    cam_height=(grid_size[1]//scaled_size)+1
+    bottom_right=[top_left[0]+cam_length,top_left[1]+cam_height]
     for y in range(top_left[1],bottom_right[1]):
         for x in range(top_left[0],bottom_right[0]):
-            camera_hide_grid.append(hide_grid[x+y*grid_length])
-            camera_grid.append(grid[x+y*grid_length])
+            if x+y*grid_length<len(hide_grid):
+                camera_hide_grid.append(hide_grid[x+y*grid_length])
+                camera_grid.append(grid[x+y*grid_length])
     return camera_hide_grid,camera_grid
 camera_sight_hide_grid=[]
 camera_sight_grid=[]
@@ -299,46 +291,44 @@ while running:
                     iteration+=1
         elif camera_exists:
             keys = pygame.key.get_pressed()
+            cam_changed=False
             if keys[pygame.K_LEFT]:
                 camera_pos=move_camera("left",camera_pos)
-                temp=get_cameras_sight(camera_pos)
-                camera_sight_hide_grid=temp[0]
-                camera_sight_grid=temp[1]
+                cam_changed=True
             if keys[pygame.K_RIGHT]:
                 camera_pos=move_camera("right",camera_pos)
-                temp=get_cameras_sight(camera_pos)
-                camera_sight_hide_grid=temp[0]
-                camera_sight_grid=temp[1]
+                cam_changed=True
             if keys[pygame.K_UP]:
                 camera_pos=move_camera("up",camera_pos)
-                temp=get_cameras_sight(camera_pos)
-                camera_sight_hide_grid=temp[0]
-                camera_sight_grid=temp[1]
+                cam_changed=True
             if keys[pygame.K_DOWN]:
                 camera_pos=move_camera("down",camera_pos)
+                cam_changed=True
+            if cam_changed:
                 temp=get_cameras_sight(camera_pos)
                 camera_sight_hide_grid=temp[0]
                 camera_sight_grid=temp[1]
             temp=[]
             #draws the grid according to the camera position and the new camera sight and camera sight hide grid
-            cam_length=grid_size[0]//scaled_size
-            cam_height=grid_size[1]//scaled_size
+            cam_length=(grid_size[0]//scaled_size)+2
+            cam_height=(grid_size[1]//scaled_size)+1
             iteration=0
             for row in range(cam_height):
                 for col in range(cam_length):
                     if iteration < cam_length*cam_height:
-                        x = (col * scaled_size)+camera_pos[0]
-                        y = (row * scaled_size)+camera_pos[1]
-                        if camera_sight_hide_grid[iteration]==0:
-                            thing = img_list[camera_sight_grid[iteration]]
-                        elif camera_sight_hide_grid[iteration]==1:
-                            thing = img_list[11]
-                        elif camera_sight_hide_grid[iteration]==2:
-                            thing = img_list[9]
-                        else:
-                            thing = guess_flags[camera_sight_hide_grid[iteration]-3]
-                        screen.blit(thing, (x, y))
-                        iteration+=1
+                        if iteration<len(camera_sight_hide_grid):
+                            x = (col * scaled_size)+offset[0]
+                            y = (row * scaled_size)+offset[1]
+                            if camera_sight_hide_grid[iteration]==0:
+                                thing = img_list[camera_sight_grid[iteration]]
+                            elif camera_sight_hide_grid[iteration]==1:
+                                thing = img_list[11]
+                            elif camera_sight_hide_grid[iteration]==2:
+                                thing = img_list[9]
+                            else:
+                                thing = guess_flags[camera_sight_hide_grid[iteration]-3]
+                            screen.blit(thing, (x, y))
+                            iteration+=1
         if play or gen_grids:
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
@@ -366,6 +356,9 @@ while running:
                                 e=1
                                 times=4
                             flagged=mines
+                            temp=get_cameras_sight(camera_pos)
+                            camera_sight_hide_grid=temp[0]
+                            camera_sight_grid=temp[1]
                     elif event.key == pygame.K_ESCAPE:
                         running = False
                     elif event.key == pygame.K_p:
@@ -571,6 +564,9 @@ while running:
                             else:
                                 hide_grid[index]=guess_flag_help+2
                                 guess_flag_help=0
+                    temp=get_cameras_sight(camera_pos)
+                    camera_sight_hide_grid=temp[0]
+                    camera_sight_grid=temp[1]
         else:
             for event in pygame.event.get():
                 if ete==2 and event.type==pygame.KEYUP and grids_generated>0:
@@ -612,6 +608,9 @@ while running:
                             count+=1
                             print(count)
                             flagged=mines
+                            temp=get_cameras_sight(camera_pos)
+                            camera_sight_hide_grid=temp[0]
+                            camera_sight_grid=temp[1]
                     elif event.key == pygame.K_p:
                         ete=2
                     elif event.key == pygame.K_s:
@@ -719,6 +718,8 @@ while running:
                 temp=get_cameras_sight(camera_pos)
                 camera_sight_hide_grid=temp[0]
                 camera_sight_grid=temp[1]
+                if not camera_exists:
+                    camera_pos=[0,0]
                 if settings_temp_vari:
                     settings_temp_vari=False
                     see_controls=True
