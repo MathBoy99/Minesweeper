@@ -284,8 +284,8 @@ while running:
             for row in range(grid_height):
                 for col in range(grid_length):
                     if iteration < grid_length*grid_height:
-                        x = (col * scaled_size)+camera_pos[0]
-                        y = (row * scaled_size)+camera_pos[1]
+                        x = (col * scaled_size)
+                        y = (row * scaled_size)
                         #only actually draws stuff if it is on the screen according to the camera position and the grid size
                         if hide_grid[iteration]==0:
                             thing = img_list[grid[iteration]]
