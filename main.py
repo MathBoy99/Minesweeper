@@ -197,8 +197,8 @@ def get_cameras_sight(camera_pos):
         bottom_right=[bottom_right%grid_length,bottom_right//grid_length]
     else:
         bottom_right=[grid_length,grid_height]
-    for x in range(top_left[0],bottom_right[0]):
-        for y in range(top_left[1],bottom_right[1]):
+    for y in range(top_left[0],bottom_right[0]):
+        for x in range(top_left[1],bottom_right[1]):
             camera_hide_grid.append(hide_grid[x+y*grid_length])
             camera_grid.append(grid[x+y*grid_length])
     return camera_hide_grid,camera_grid
