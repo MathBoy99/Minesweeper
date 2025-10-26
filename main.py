@@ -543,6 +543,7 @@ while running:
                                     print("You won")
                                     r=True
                                     fill=[0,120,120]
+                index=get_index(pygame.mouse.get_pos()[0],pygame.mouse.get_pos()[1],grid_length,grid_height,scaled_size,camera_pos)
                 if index!=":(":
                     temp=get_cameras_sight(camera_pos)
                     camera_sight_hide_grid=temp[0]
