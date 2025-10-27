@@ -7,11 +7,21 @@ import sys
 pygame.font.init()
 changed=False
 ete=0
+hold=False
 settings_temp_vari=False
 controls_temp_vari=False
 allow_anything=False
 better_grid_gen=True
+bounding_mode=False
+bounding=False
+bounding_pos=[0,0]
+bounding_boxes=[]
+bounding_color=(0,0,0)
+bounding_colors=[(180,0,255),(255,255,0),(0,0,255),(0,255,0)]
 offset=[0,0]
+delete_bounding_boxes=False
+#based on guess flag colors
+boudning_colors=[]
 # Base grid_length is 24
 grid_length = 24
 # Base grid_height is 16
@@ -240,7 +250,10 @@ control_text_list=[
     {"text": "S: Exit/Enter Settings", "position": (0, 50+scaled_size*8+gap*8), "font_size": 24},
     {"text": "C: Exit/Enter Controls", "position": (0, 50+scaled_size*9+gap*9), "font_size": 24},
     {"text": "Arrow Keys: Move Camera (only in grids where", "position": (0, 50+scaled_size*10+gap*10), "font_size": 24},
-    {"text": "camera is needed)", "position": (0, 50+scaled_size*11+gap*11), "font_size": 24}
+    {"text": "camera is needed)", "position": (0, 50+scaled_size*11+gap*11), "font_size": 24},
+    {"text": "B: Enter/Exit Bounding Box Mode (disables guess", "position": (0, 50+scaled_size*12+gap*12), "font_size": 24},
+    {"text": "flags)", "position": (0, 50+scaled_size*13+gap*13), "font_size": 24},
+    {"text": "Backspace: Delete Bounding Boxes", "position": (0, 50+scaled_size*14+gap*14), "font_size": 24}
 ]
 rendered_texts = []
 rendered_control_texts=[]
@@ -329,6 +342,11 @@ while running:
                                 thing = guess_flags[camera_sight_hide_grid[iteration]-3]
                             screen.blit(thing, (x, y))
                             iteration+=1
+        for item in bounding_boxes:
+            try:
+                screen.blit(item[0],(item[1][0]+camera_pos[0],item[1][1]+camera_pos[1]))
+            except:
+                print(item)
         if play or gen_grids:
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
@@ -373,17 +391,78 @@ while running:
                         find_eight=False
                         gen_grids=False
                     elif event.key == pygame.K_1:
-                        guess_flag_help=1
+                        if not bounding_mode:
+                            guess_flag_help=1
+                        else:
+                            hold=True
+                            bounding_color=bounding_colors[0]
                     elif event.key == pygame.K_2:
-                        guess_flag_help=2
+                        if not bounding_mode:
+                            guess_flag_help=2
+                        else:
+                            hold=True
+                            bounding_color=bounding_colors[1]
                     elif event.key == pygame.K_3:
-                        guess_flag_help=3
+                        if not bounding_mode:
+                            guess_flag_help=3
+                        else:
+                            hold=True
+                            bounding_color=bounding_colors[2]
                     elif event.key == pygame.K_4:
-                        guess_flag_help=4
+                        if not bounding_mode:
+                            guess_flag_help=4
+                        else:
+                            hold=True
+                            bounding_color=bounding_colors[3]
                     elif event.key == pygame.K_s:
                         apple_tree=2
                     elif event.key == pygame.K_c:
                         about_to_see_controls=True
+                    elif event.key == pygame.K_b:
+                        bounding_mode=not bounding_mode
+                    elif event.key == pygame.K_BACKSPACE:
+                        delete_bounding_boxes=True
+                elif event.type == pygame.KEYUP:
+                    if bounding_mode:
+                        if bounding:
+                            bounding=False
+                            hold=False
+                            transparency=100
+                            if bounding_pos[0]<pygame.mouse.get_pos()[0] and bounding_pos[1]<pygame.mouse.get_pos()[1]:
+                                top_left=[bounding_pos[0],bounding_pos[1]]
+                                width=pygame.mouse.get_pos()[0]-bounding_pos[0]
+                                height=pygame.mouse.get_pos()[1]-bounding_pos[1]
+                            elif bounding_pos[0]>pygame.mouse.get_pos()[0] and bounding_pos[1]>pygame.mouse.get_pos()[1]: 
+                                top_left=[pygame.mouse.get_pos()[0],pygame.mouse.get_pos()[1]]
+                                width=bounding_pos[0]-pygame.mouse.get_pos()[0]
+                                height=bounding_pos[1]-pygame.mouse.get_pos()[1]
+                            elif bounding_pos[0]<pygame.mouse.get_pos()[0] and bounding_pos[1]>pygame.mouse.get_pos()[1]:
+                                top_left=[bounding_pos[0],pygame.mouse.get_pos()[1]]
+                                width=pygame.mouse.get_pos()[0]-bounding_pos[0]
+                                height=bounding_pos[1]-pygame.mouse.get_pos()[1]
+                            else:
+                                top_left=[pygame.mouse.get_pos()[0],bounding_pos[1]]
+                                width=bounding_pos[0]-pygame.mouse.get_pos()[0]
+                                height=pygame.mouse.get_pos()[1]-bounding_pos[1]
+                            top_left[0]-=camera_pos[0]
+                            top_left[1]-=camera_pos[1]
+                            if width>10 and height>10:
+                                bound_surface=pygame.Surface((width,height),pygame.SRCALPHA)
+                                pygame.draw.rect(bound_surface,(bounding_color[0],bounding_color[1],bounding_color[2],transparency),(0,0,width,height))
+                                bounding_boxes.append((bound_surface,top_left))
+                    if delete_bounding_boxes:
+                        for item in bounding_boxes:
+                            #account for camera pos
+                            if item[1][0]+camera_pos[0]<pygame.mouse.get_pos()[0]<item[1][0]+item[0].get_width()+camera_pos[0] and item[1][1]+camera_pos[1]<pygame.mouse.get_pos()[1]<item[1][1]+item[0].get_height()+camera_pos[1]:
+                                bounding_boxes.remove(item)
+                                break
+                        delete_bounding_boxes=False
+                if hold:
+                    if not bounding:
+                        bounding=True
+                        bounding_pos=[pygame.mouse.get_pos()[0],pygame.mouse.get_pos()[1]]
+                
+                    
                 elif ete==2 and event.type==pygame.KEYUP and grids_generated>0:
                     y=-1
                     ete=0
@@ -716,6 +795,13 @@ while running:
                     #changes the camera pos proportionally to the scale factor
                     camera_pos[0]=camera_pos[0]*(scale_factor/mem_scale_factor)
                     camera_pos[1]=camera_pos[1]*(scale_factor/mem_scale_factor)
+                    #changes the bounding boxes proportionally to the scale factor
+                    it=0
+                    for item in bounding_boxes:
+                        bounding_boxes[it]=(pygame.transform.scale(item[0],(item[0].get_width()*(scale_factor/mem_scale_factor),item[0].get_height()*(scale_factor/mem_scale_factor))),item[1])
+                        bounding_boxes[it][1][0]=bounding_boxes[it][1][0]*(scale_factor/mem_scale_factor)
+                        bounding_boxes[it][1][1]=bounding_boxes[it][1][1]*(scale_factor/mem_scale_factor)
+                        it+=1
                 temp=get_cameras_sight(camera_pos)
                 camera_sight_hide_grid=temp[0]
                 camera_sight_grid=temp[1]
