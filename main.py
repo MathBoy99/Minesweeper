@@ -20,6 +20,7 @@ bounding_color=(0,0,0)
 bounding_colors=[(180,0,255),(255,255,0),(0,0,255),(0,255,0)]
 offset=[0,0]
 delete_bounding_boxes=False
+visible_bounding_boxes=[]
 #based on guess flag colors
 boudning_colors=[]
 # Base grid_length is 24
@@ -186,6 +187,14 @@ def move_camera(direction,pos):
         offset[0]=(scaled_size+offset[0])*-1
     if offset[1]!=0:
         offset[1]=(scaled_size+offset[1])*-1
+    global visible_bounding_boxes
+    visible_bounding_boxes=[]
+    it=0
+    for item in bounding_boxes:
+        if item[1][0]+camera_pos[0]<grid_size[0] and item[1][1]+camera_pos[1]<grid_size[1]:
+            visible_bounding_boxes.append(it)
+        it+=1
+            
     return pos
 def get_cameras_sight(camera_pos):
     camera_hide_grid=[]
@@ -342,11 +351,8 @@ while running:
                                 thing = guess_flags[camera_sight_hide_grid[iteration]-3]
                             screen.blit(thing, (x, y))
                             iteration+=1
-        for item in bounding_boxes:
-            try:
-                screen.blit(item[0],(item[1][0]+camera_pos[0],item[1][1]+camera_pos[1]))
-            except:
-                print(item)
+        for item in visible_bounding_boxes:
+            screen.blit(bounding_boxes[item][0], (bounding_boxes[item][1][0]+camera_pos[0], bounding_boxes[item][1][1]+camera_pos[1]))
         if play or gen_grids:
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
@@ -450,12 +456,16 @@ while running:
                                 bound_surface=pygame.Surface((width,height),pygame.SRCALPHA)
                                 pygame.draw.rect(bound_surface,(bounding_color[0],bounding_color[1],bounding_color[2],transparency),(0,0,width,height))
                                 bounding_boxes.append((bound_surface,top_left))
+                                visible_bounding_boxes.append(len(bounding_boxes)-1)
+                    it=0
                     if delete_bounding_boxes:
                         for item in bounding_boxes:
                             #account for camera pos
                             if item[1][0]+camera_pos[0]<pygame.mouse.get_pos()[0]<item[1][0]+item[0].get_width()+camera_pos[0] and item[1][1]+camera_pos[1]<pygame.mouse.get_pos()[1]<item[1][1]+item[0].get_height()+camera_pos[1]:
                                 bounding_boxes.remove(item)
+                                visible_bounding_boxes.remove(it)
                                 break
+                            it+=1
                         delete_bounding_boxes=False
                 if hold:
                     if not bounding:
@@ -779,6 +789,7 @@ while running:
                         j[4]=1
                         j[5]=0
                         mines=round(grid_length*grid_height*mine_density)
+                    bounding_boxes=[]
                 #just changes the size of the cells for scale factor if only it was changed
                 if j[6]+j[7]/10+j[8]/100!=scale_factor and not changed:
                     Stuff=start_program_math(grid_length,grid_height,mine_density,j[6]+j[7]/10+j[8]/100)
