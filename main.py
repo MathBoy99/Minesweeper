@@ -351,8 +351,6 @@ while running:
                                 thing = guess_flags[camera_sight_hide_grid[iteration]-3]
                             screen.blit(thing, (x, y))
                             iteration+=1
-        for item in visible_bounding_boxes:
-            screen.blit(bounding_boxes[item][0], (bounding_boxes[item][1][0]+camera_pos[0], bounding_boxes[item][1][1]+camera_pos[1]))
         if play or gen_grids:
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
@@ -459,13 +457,21 @@ while running:
                                 visible_bounding_boxes.append(len(bounding_boxes)-1)
                     it=0
                     if delete_bounding_boxes:
-                        for item in bounding_boxes:
-                            #account for camera pos
-                            if item[1][0]+camera_pos[0]<pygame.mouse.get_pos()[0]<item[1][0]+item[0].get_width()+camera_pos[0] and item[1][1]+camera_pos[1]<pygame.mouse.get_pos()[1]<item[1][1]+item[0].get_height()+camera_pos[1]:
-                                bounding_boxes.remove(item)
-                                visible_bounding_boxes.remove(it)
-                                break
-                            it+=1
+                        if len(bounding_boxes)>0:
+                            remove=0
+                            it=0
+                            for item in bounding_boxes:
+                                #account for camera pos
+                                if item[1][0]+camera_pos[0]<pygame.mouse.get_pos()[0]<item[1][0]+item[0].get_width()+camera_pos[0] and item[1][1]+camera_pos[1]<pygame.mouse.get_pos()[1]<item[1][1]+item[0].get_height()+camera_pos[1]:
+                                    remove=it
+                                    break
+                                it+=1
+                            bounding_boxes.pop(remove)
+                            visible_bounding_boxes.pop(remove)
+                            it=0
+                            for item in visible_bounding_boxes:
+                                visible_bounding_boxes[it]-=1
+                                it+=1
                         delete_bounding_boxes=False
                 if hold:
                     if not bounding:
@@ -709,6 +715,8 @@ while running:
                     elif event.key == pygame.K_c:
                         about_to_see_controls=True
                         apple_tree=0
+                    elif event.key == pygame.K_BACKSPACE:
+                        delete_bounding_boxes=True
                 elif event.type == pygame.KEYUP:
                     if apple_tree==2:
                         apple_tree=0
@@ -717,6 +725,31 @@ while running:
                     elif about_to_see_controls:
                         about_to_see_controls=False
                         see_controls=True
+                    if delete_bounding_boxes:
+                        remove=0
+                        it=0
+                        for item in bounding_boxes:
+                            #account for camera pos
+                            if item[1][0]+camera_pos[0]<pygame.mouse.get_pos()[0]<item[1][0]+item[0].get_width()+camera_pos[0] and item[1][1]+camera_pos[1]<pygame.mouse.get_pos()[1]<item[1][1]+item[0].get_height()+camera_pos[1]:
+                                remove=it
+                                break
+                            it+=1
+                        bounding_boxes.pop(remove)
+                        visible_bounding_boxes.pop(remove)
+                        it=0
+                        for item in visible_bounding_boxes:
+                            visible_bounding_boxes[it]-=1
+                            it+=1
+                        delete_bounding_boxes=False
+        remove=[]
+        for item in visible_bounding_boxes:
+            if item<len(bounding_boxes):
+                screen.blit(bounding_boxes[item][0], (bounding_boxes[item][1][0]+camera_pos[0], bounding_boxes[item][1][1]+camera_pos[1]))
+            else:
+                remove.append(item)
+                print("removed ",item," from visible_bounding_boxes because bounding length is ",len(bounding_boxes))
+        for item in remove:
+            visible_bounding_boxes.remove(item)
     elif in_settings:
         for item in settings_buttons:
             screen.blit(settings_tiles_in_order[j[settings_buttons.index(item)]], (item.x, item.y))
